@@ -3,10 +3,9 @@ const execa = require('execa');
 
 const starlarkSourceDir = path.join(__dirname, 'go-starlark');
 
-const run = async sourceCode => {
-	const child = execa('go', ['run', '.'], {
+const run = async sourceFile => {
+	const child = execa('go', ['run', '.', sourceFile], {
 		cwd: starlarkSourceDir,
-		input: sourceCode,
 		stdio: ['pipe', 'inherit', 'inherit', 'ipc'],
 	});
 

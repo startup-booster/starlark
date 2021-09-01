@@ -8,11 +8,10 @@ class Starlark {
 	}
 
 	async runFile(filename) {
-		const source = await fs.readFile(filename, 'utf8');
-		await this.runSource(source);
+		goStarlark(filename);
 	}
 	async runSource(source) {
-		goStarlark(source);
+		throw new Error('Not implemented');
 	}
 }
 

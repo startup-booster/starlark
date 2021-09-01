@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"os"
 
 	"github.com/startup-booster/starlark/go-starlark/ipc"
 
@@ -31,13 +32,20 @@ func load(t *starlark.Thread, path string) (starlark.StringDict, error) {
 }
 
 func main() {
+	if len(os.Args) != 2 {
+		log.Fatalf("usage: %s <script>", os.Args[0])
+		os.Exit(1)
+	}
+
+	starfile := os.Args[1]
+
 	err := ipc.InitNodeCommunication()
 	if err != nil {
 		panic(err)
 	}
 
 	thread := initThread()
-	_, err = load(thread, "main.star")
+	_, err = load(thread, starfile)
 	if err != nil {
 		log.Fatal(err)
 	}
