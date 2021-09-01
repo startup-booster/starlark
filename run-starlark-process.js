@@ -7,7 +7,12 @@ const run = async sourceCode => {
 	const child = execa('go', ['run', '.'], {
 		cwd: starlarkSourceDir,
 		input: sourceCode,
-		stdio: ['pipe', 'inherit', 'inherit'],
+		stdio: ['pipe', 'inherit', 'inherit', 'ipc'],
+	});
+
+	child.on('message', ({ message, payload }) => {
+		console.log(`Node.js handling message ${JSON.stringify({ message, payload })}`);
+		child.send({ response: 'ok' });
 	});
 
 	return await child;

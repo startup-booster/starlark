@@ -31,9 +31,13 @@ func load(t *starlark.Thread, path string) (starlark.StringDict, error) {
 }
 
 func main() {
-	thread := initThread()
-	_, err := load(thread, "main.star")
+	err := ipc.InitNodeCommunication()
+	if err != nil {
+		panic(err)
+	}
 
+	thread := initThread()
+	_, err = load(thread, "main.star")
 	if err != nil {
 		log.Fatal(err)
 	}
