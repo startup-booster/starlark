@@ -7,7 +7,7 @@ def __ipc_wrapper__(name):
         })
         if 'error' in result:
             print('Error from IPC call: ', result['error'])
-        return result['response']
+        return result.get('response', None)
     return call
 
 
