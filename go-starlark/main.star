@@ -1,5 +1,16 @@
-print('b', ipc.call('{ "message": "testPrint", "payload": ["hello"] }'))
+
+def __ipc_wrapper__(name):
+    def call(payload):
+        result = __nodejs_ipc_call__({
+            "message": name,
+            "payload": payload,
+        })
+        if 'error' in result:
+            print('Error from IPC call: ', result['error'])
+        return result['response']
+    return call
 
 
-def k8s_resource(x):
-    ipc.call(json.encode({message: k8s_resource, payload: x}))
+k8s_resource = __ipc_wrapper__('k8s_resource')
+
+print(k8s_resource('pod.yaml'))

@@ -20,7 +20,7 @@ func initThread() *starlark.Thread {
 	starlark.Universe["json"] = json.Module
 	starlark.Universe["time"] = time.Module
 	starlark.Universe["math"] = math.Module
-	starlark.Universe["ipc"] = ipc.Module
+	starlark.Universe["__nodejs_ipc_call__"] = ipc.IpcCallBuiltin
 
 	return thread
 }

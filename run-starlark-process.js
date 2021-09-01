@@ -10,8 +10,8 @@ const run = async sourceCode => {
 		stdio: ['pipe', 'inherit', 'inherit', 'ipc'],
 	});
 
-	child.on('message', ({ message, payload }) => {
-		console.log(`Node.js handling message ${JSON.stringify({ message, payload })}`);
+	child.on('message', message => {
+		console.log(`Node.js handling message ${JSON.stringify(message)}`);
 		child.send({ response: 'ok' });
 	});
 

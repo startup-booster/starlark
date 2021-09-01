@@ -1,54 +1,45 @@
 package ipc
 
 import (
-	"fmt"
+	"log"
 
 	"github.com/zealic/go2node"
 	"go.starlark.net/starlark"
-	"go.starlark.net/starlarkstruct"
+
+	"go.starlark.net/lib/json"
 )
 
-func read(thread *starlark.Thread, _ *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
-	if args != nil && args.Len() != 0 {
-		return nil, fmt.Errorf("expected 0 argument, got %d", args.Len())
-	}
-
-	msg, err := NodeCommunicationChannel.Read()
-	if err != nil {
-		return nil, err
-	}
-	return starlark.String(msg.Message), nil
-}
-
-func write(thread *starlark.Thread, _ *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
-	if args == nil || args.Len() != 1 {
-		return nil, fmt.Errorf("expected 1 argument, got %d", args.Len())
-	}
-
-	arg := args.Index(0)
-	if arg.Type() != "string" {
-		return nil, fmt.Errorf("expected argument to be a string, got %#v", arg.Type())
-	}
-
-	str := args.Index(0).(starlark.String).GoString()
-	err := NodeCommunicationChannel.Write(&go2node.NodeMessage{
-		Message: []byte(str),
-	})
-	return starlark.None, err
-}
+var jsonEncode = json.Module.Members["encode"].(*starlark.Builtin)
+var jsonDecode = json.Module.Members["decode"].(*starlark.Builtin)
 
 func call(thread *starlark.Thread, _ *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
-	_, err := write(thread, nil, args, kwargs)
+	log.Println(args)
+	jsonValue, err := jsonEncode.CallInternal(thread, args, kwargs)
 	if err != nil {
-		fmt.Println("ERROR!")
 		return nil, err
 	}
-	return read(thread, nil, starlark.Tuple{}, []starlark.Tuple{})
+
+	jsonString := jsonValue.(starlark.String).GoString()
+	err = NodeCommunicationChannel.Write(&go2node.NodeMessage{
+		Message: []byte(jsonString),
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	response, err := NodeCommunicationChannel.Read()
+	if err != nil {
+		return nil, err
+	}
+
+	// return starlark.String(response.Message), nil
+
+	decoded, err := jsonDecode.CallInternal(thread, starlark.Tuple{starlark.String(response.Message)}, []starlark.Tuple{})
+	if err != nil {
+		return nil, err
+	}
+
+	return decoded, nil
 }
 
-var Module = &starlarkstruct.Module{
-	Name: "ipc",
-	Members: starlark.StringDict{
-		"call": starlark.NewBuiltin("ipc.call", call),
-	},
-}
+var IpcCallBuiltin = starlark.NewBuiltin("__nodejs_ipc_call__", call)
