@@ -17,5 +17,5 @@ starlark.registerHandler('k8s_resource', async () => {
 	}
 	const endTime = performance.now();
 
-	console.log(endTime - startTime);
+	console.log((endTime - startTime) / 1000);
 })();
