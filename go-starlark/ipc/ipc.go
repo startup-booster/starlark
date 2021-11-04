@@ -1,8 +1,6 @@
 package ipc
 
 import (
-	"log"
-
 	"github.com/zealic/go2node"
 	"go.starlark.net/starlark"
 
@@ -13,7 +11,6 @@ var jsonEncode = json.Module.Members["encode"].(*starlark.Builtin)
 var jsonDecode = json.Module.Members["decode"].(*starlark.Builtin)
 
 func call(thread *starlark.Thread, _ *starlark.Builtin, args starlark.Tuple, kwargs []starlark.Tuple) (starlark.Value, error) {
-	log.Println(args)
 	jsonValue, err := jsonEncode.CallInternal(thread, args, kwargs)
 	if err != nil {
 		return nil, err

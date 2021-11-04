@@ -13,4 +13,5 @@ def __ipc_wrapper__(name):
 
 k8s_resource = __ipc_wrapper__('k8s_resource')
 
+k8s_resource('pod.yaml')
 print(k8s_resource('pod.yaml'))

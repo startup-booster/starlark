@@ -4,7 +4,10 @@
 	"main": "index.js",
 	"license": "MIT",
 	"scripts": {
-		"postinstall": "husky install"
+		"postinstall": "husky install",
+		"build-go-starlark": "cd go-starlark && go get . && go build -o ../go-starlark-bin .",
+		"start": "yarn build-go-starlark && go run .",
+		"prepublish": "yarn build-go-starlark"
 	},
 	"dependencies": {
 		"execa": "^5.1.1",
