@@ -29,8 +29,6 @@ func call(thread *starlark.Thread, _ *starlark.Builtin, args starlark.Tuple, kwa
 		return nil, err
 	}
 
-	// return starlark.String(response.Message), nil
-
 	decoded, err := jsonDecode.CallInternal(thread, starlark.Tuple{starlark.String(response.Message)}, []starlark.Tuple{})
 	if err != nil {
 		return nil, err
